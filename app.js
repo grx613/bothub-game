@@ -1,106 +1,193 @@
-// переключалка
 (() => {
-  const clickerBtn = document.getElementById('clickerBtn');
-  const pacmanBtn = document.getElementById('pacmanBtn');
-  const toMenu1 = document.getElementById('toMenu1');
-  const toMenu2 = document.getElementById('toMenu2');
-  const clickerGame = document.getElementById('clickerGame');
-  const pacmanGame = document.getElementById('pacmanGame');
+  const tokensEl = document.getElementById('tokensValue');
+  const popEl = document.getElementById('popValue');
+  const vramBar = document.getElementById('vramBar');
+  const ctxBar = document.getElementById('ctxBar');
+  const vramPct = document.getElementById('vramPct');
+  const ctxPct = document.getElementById('ctxPct');
+  const feedBtn = document.getElementById('feedBtn');
+  const swarm = document.getElementById('swarm');
+  const shareBtn = document.getElementById('shareBtn');
+  const shareBtn2 = document.getElementById('shareBtn2');
+  const resetBtn = document.getElementById('resetBtn');
+  const overlay = document.getElementById('overlay');
+  const closeOv = document.getElementById('closeOv');
 
-  function show(game) {
-    clickerGame.classList.add('hidden');
-    pacmanGame.classList.add('hidden');
-    if (game) game.classList.remove('hidden');
-  }
+  const state = {
+    tokens: 0,
+    pop: 3,
+    vram: 100,
+    ctx: 100,
+    ended: false
+  };
 
-  clickerBtn.addEventListener('click', () => show(clickerGame));
-  pacmanBtn.addEventListener('click', () => show(pacmanGame));
-  if (toMenu1) toMenu1.addEventListener('click', () => show(null));
-  if (toMenu2) toMenu2.addEventListener('click', () => show(null));
+  function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+  function fmt(n){ return new Intl.NumberFormat('ru-RU').format(n); }
 
-  show(null); // старт — меню
-})();
-
-// ----- CLICKER -----
-/* скопирована логика из cliker-app.js с исправленными id overlay */
-(() => {
-  const tokensEl=document.getElementById('tokensValue');
-  if(!tokensEl) return; // значит игра не показана
-  const popEl=document.getElementById('popValue');
-  const vramBar=document.getElementById('vramBar');
-  const ctxBar=document.getElementById('ctxBar');
-  const vramPct=document.getElementById('vramPct');
-  const ctxPct=document.getElementById('ctxPct');
-  const feedBtn=document.getElementById('feedBtn');
-  const swarm=document.getElementById('swarm');
-  const shareBtn=document.getElementById('shareBtn');
-  const shareBtn2=document.getElementById('shareBtn2');
-  const resetBtn=document.getElementById('resetBtn');
-  const overlay=document.getElementById('overlay');
-  const closeOv=document.getElementById('closeOv');
-  const state={tokens:0,pop:3,vram:100,ctx:100,ended:false};
-  function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
-  function fmt(n){return new Intl.NumberFormat('ru-RU').format(n);}
   function updateBars(){
-    vramBar.style.width=`${state.vram}%`;ctxBar.style.width=`${state.ctx}%`;
-    vramPct.textContent=`${Math.round(state.vram)}%`;ctxPct.textContent=`${Math.round(state.ctx)}%`;
+    vramBar.style.width = `${state.vram}%`;
+    ctxBar.style.width = `${state.ctx}%`;
+    vramPct.textContent = `${Math.round(state.vram)}%`;
+    ctxPct.textContent = `${Math.round(state.ctx)}%`;
   }
-  function render(){tokensEl.textContent=fmt(state.tokens);popEl.textContent=fmt(state.pop);updateBars();}
-  function rand(min,max){return Math.random()*(max-min)+min;}
-  function randColor(){const pal=['#6b5cff','#8a6bff','#ff6bd6','#59c4ff','#7af0d8','#ffa86b'];return pal[Math.floor(Math.random()*pal.length)];}
-  function svgIsherg(c){return `<svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="${c}"/></svg>`;}
-  function addBurst(){const el=document.createElement('div');el.className='ish';el.style.left=rand(20,200)+'px';el.style.top=rand(20,200)+'px';el.innerHTML=svgIsherg(randColor());swarm.appendChild(el);}
-  function feed(){if(state.ended)return;state.tokens++;state.pop+=1;state.vram=clamp(state.vram-0.6,0,100);state.ctx=clamp(state.ctx-1.2,0,100);render();addBurst(); if(state.vram<=0||state.ctx<=0) end();}
-  function end(){state.ended=true;overlay.classList.remove('hidden');document.getElementById('ovText').textContent=`Ищерги съели ${fmt(state.tokens)} токенов. Популяция ${fmt(state.pop)}.`;}
-  function reset(){state.tokens=0;state.pop=3;state.vram=100;state.ctx=100;state.ended=false;overlay.classList.add('hidden');swarm.innerHTML='';render();}
-  feedBtn.addEventListener('click',feed);
-  resetBtn.addEventListener('click',reset);
-  closeOv.addEventListener('click',reset);
-  function share(){navigator.clipboard.writeText(`Мой результат: ${state.tokens} токенов, популяция ${state.pop}`);}
-  shareBtn.addEventListener('click',share); if(shareBtn2)shareBtn2.addEventListener('click',share);
-  render();
-})();
 
-// ----- PACMAN -----
-/* скопирован из pacman-app.js с переименованным overlay */
-(() => {
-  const canvas=document.getElementById('game'); if(!canvas) return;
-  const ctx=canvas.getContext('2d');
-  const scoreEl=document.getElementById('score');
-  const leftEl=document.getElementById('left');
-  const livesEl=document.getElementById('lives');
-  const restartBtn=document.getElementById('restart');
-  const shareBtn=document.getElementById('share');
-  const overlay=document.getElementById('overlayPac');
-  const ovTitle=document.getElementById('ovTitle');
-  const ovText=document.getElementById('ovText');
-  const ovRestart=document.getElementById('ovRestart');
-  const ovShare=document.getElementById('ovShare');
-  document.querySelectorAll('.dpad button').forEach(b=>b.addEventListener('click',()=>setDir(b.dataset.dir)));
-  const MAP=["#################","#........#......#","#.###.##.#.##.#.#","#.#.......#.....#","#.#.#####.#.###.#","#...............#","###.#.#####.#.###","#...#...#...#...#","#.#####.#.#####.#","#.......P.......#","#.#####.#.#####.#","#...#...#...#...#","###.#.#####.#.###","#...............#","#.#.#####.#.###.#","#o..............#","#################"];
-  const ROWS=MAP.length,COLS=MAP[0].length;
-  let tile=24; function resize(){const s=Math.min(window.innerWidth*0.94,560);canvas.width=s*devicePixelRatio;canvas.height=s*devicePixelRatio;canvas.style.width=s+'px';canvas.style.height=s+'px';tile=Math.floor(canvas.width/COLS);} resize(); addEventListener('resize',resize);
-  const dirs={left:{dx:-1,dy:0,ang:Math.PI},right:{dx:1,dy:0,ang:0},up:{dx:0,dy:-1,ang:-Math.PI/2},down:{dx:0,dy:1,ang:Math.PI/2}};
-  const pass=(x,y)=>{if(x<0)x=COLS-1;if(x>=COLS)x=0;if(y<0||y>=ROWS) return false; return MAP[y][x]!=='#';};
-  let state={score:0,left:0,lives:3,frightenedUntil:0,over:false,win:false};
-  let player={x:8,y:9,dir:'left',next:'left'}; let enemies=[];
-  const tokens=new Set(),powers=new Set(); const key=(x,y)=>`${x},${y}`;
-  function parseMap(){tokens.clear();powers.clear();for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){let c=MAP[y][x]; if(c=='.')tokens.add(key(x,y)); if(c=='o')powers.add(key(x,y));} state.left=tokens.size+powers.size;}
-  function spawnPlayer(){for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++) if(MAP[y][x]=='P') return {x,y,dir:'left',next:'left'};return {x:1,y:1,dir:'right',next:'right'};}
-  function spawnEnemies(){const c=Math.floor(COLS/2),r=Math.floor(ROWS/2);return[{x:c-2,y:r-2,dir:'right',deadUntil:0,color:'#ff6bd6'},{x:c+2,y:r-2,dir:'left',deadUntil:0,color:'#59c4ff'},{x:c,y:r+1,dir:'up',deadUntil:0,color:'#ffa86b'}];}
-  function init(){state={score:0,left:0,lives:3,frightenedUntil:0,over:false,win:false};parseMap();player=spawnPlayer();enemies=spawnEnemies();overlay.classList.add('hidden');}
-  function setDir(n){if(dirs[n])player.next=n;}
-  document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='a')setDir('left');if(e.key==='ArrowRight'||e.key==='d')setDir('right');if(e.key==='ArrowUp'||e.key==='w')setDir('up');if(e.key==='ArrowDown'||e.key==='s')setDir('down');});
-  restartBtn.addEventListener('click',init); ovRestart.addEventListener('click',init);
-  shareBtn.addEventListener('click',()=>navigator.clipboard.writeText("Мой счёт "+state.score)); ovShare.addEventListener('click',()=>navigator.clipboard.writeText("Мой счёт "+state.score));
-  function stepPlayer(){const nd=dirs[player.next]; if(nd&&pass(player.x+nd.dx,player.y+nd.dy))player.dir=player.next; const d=dirs[player.dir]; if(d&&pass(player.x+d.dx,player.y+d.dy)){let nx=player.x+d.dx,ny=player.y+d.dy; if(nx<0)nx=COLS-1;if(nx>=COLS)nx=0; player.x=nx;player.y=ny;const k=key(nx,ny); if(tokens.delete(k)){state.score+=10;state.left--;} if(powers.delete(k)){state.score+=50;state.left--;state.frightenedUntil=performance.now()+7000;} if(state.left<=0)win();}}
-  function stepEnemies(ts){enemies.forEach(e=>{if(e.deadUntil>ts)return; const opts=[]; for(const n in dirs){const d=dirs[n];let nx=e.x+d.dx,ny=e.y+d.dy;if(!pass(nx,ny))continue;opts.push({nx,ny,name:n});} if(opts.length){const choice=opts[Math.floor(Math.random()*opts.length)];e.x=choice.nx;e.y=choice.ny;e.dir=choice.name;}});}
-  function collisions(ts){enemies.forEach(e=>{if(e.deadUntil>ts)return; if(e.x===player.x&&e.y===player.y){lose();}});}
-  function lose(){state.lives--; if(state.lives<=0) gameOver(); else {player=spawnPlayer(); enemies=spawnEnemies();}}
-  function gameOver(){state.over=true;overlay.classList.remove('hidden');ovTitle.textContent='Игра окончена';ovText.textContent="Очки: "+state.score;}
-  function win(){state.win=true;overlay.classList.remove('hidden');ovTitle.textContent='Победа!';ovText.textContent="Очки: "+state.score;}
-  function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);const s=tile;for(let y=0;y<ROWS;y++){for(let x=0;x<COLS;x++){if(MAP[y][x]=='#'){ctx.fillStyle='#1e1b36';ctx.fillRect(x*s,y*s,s,s);} else {ctx.fillStyle='#0b0a16';ctx.fillRect(x*s,y*s,s,s); if(tokens.has(key(x,y))){ctx.fillStyle='yellow';ctx.fillRect(x*s+s/2-2,y*s+s/2-2,4,4);}}}} ctx.fillStyle='orange'; ctx.fillRect(player.x*s+4,player.y*s+4,s-8,s-8); ctx.fillStyle='red'; enemies.forEach(e=>{ctx.fillRect(e.x*s+6,e.y*s+6,s-12,s-12);}); scoreEl.textContent=state.score; leftEl.textContent=state.left; livesEl.textContent='❤️'.repeat(state.lives)||'💀';}
-  let last=0,pAcc=0,eAcc=0; const pStep=120,eStep=200;
-  function loop(ts){if(!last)last=ts; const dt=ts-last;last=ts;if(!state.over&&!state.win){pAcc+=dt;eAcc+=dt; while(pAcc>=pStep){stepPlayer();pAcc-=pStep;} while(eAcc>=eStep){stepEnemies(ts);collisions(ts);eAcc-=eStep;}} draw(); requestAnimationFrame(loop);}
-  init(); requestAnimationFrame(loop);
+  function render(){
+    tokensEl.textContent = fmt(state.tokens);
+    popEl.textContent = fmt(state.pop);
+    updateBars();
+  }
+
+  function addIshergBurst(cx, cy, count = 4){
+    const rect = swarm.getBoundingClientRect();
+    for(let i=0;i<count;i++){
+      const x = clamp((cx ?? (rect.width/2)) + rand(-60, 60), 10, rect.width-10);
+      const y = clamp((cy ?? (rect.height/2)) + rand(-40, 40), 10, rect.height-10);
+      const el = document.createElement('div');
+      el.className = 'ish';
+      el.style.left = `${x}px`;
+      el.style.top = `${y}px`;
+      swarm.appendChild(el);
+    }
+  }
+
+  function rand(min, max){ return Math.random()*(max-min)+min; }
+
+  function feed(x, y){
+    if (state.ended) return;
+    state.tokens += 1;
+    state.pop += 1 + Math.floor(state.pop * 0.01);
+    state.vram = clamp(state.vram - 0.6, 0, 100);
+    state.ctx  = clamp(state.ctx  - 1.2, 0, 100);
+    render();
+    addIshergBurst(x, y, 5);
+    if (state.vram <= 0 || state.ctx <= 0){
+      endGame();
+    }
+    save();
+  }
+
+  function endGame(){
+    state.ended = true;
+    overlay.classList.remove('hidden');
+    document.getElementById('ovText').textContent =
+      `Ищерги съели ${fmt(state.tokens)} токенов. Популяция выросла до ${fmt(state.pop)}.`;
+    // Покажем переходное окошко
+    setTimeout(()=>{
+      document.getElementById('overlayLevel2').classList.remove('hidden');
+    },1200);
+  }
+
+  function reset(){
+    window.location.reload();
+  }
+
+  async function share(){
+    const url = new URL(window.location.href);
+    url.searchParams.set('tokens', String(state.tokens));
+    url.searchParams.set('pop', String(state.pop));
+    const shareText = `⚡️ Ищерги съели ${fmt(state.tokens)} токенов. Популяция: ${fmt(state.pop)}.`;
+    const shareData = { title: 'Покорми ищергов', text: shareText, url: url.toString() };
+    try{
+      if (navigator.share) await navigator.share(shareData);
+      else await navigator.clipboard.writeText(shareData.url);
+    }catch(e){}
+  }
+
+  feedBtn.addEventListener('click', ()=>feed());
+  document.addEventListener('keydown',(e)=>{
+    if (e.code==='Space'){ e.preventDefault(); feed(); }
+  });
+
+  shareBtn.addEventListener('click', share);
+  if (shareBtn2) shareBtn2.addEventListener('click', share);
+  resetBtn.addEventListener('click', reset);
+  closeOv.addEventListener('click', reset);
+
+  function save(){
+    try{ localStorage.setItem('ishergi_v1', JSON.stringify(state)); }catch{}
+  }
+  function load(){
+    try{
+      const raw = localStorage.getItem('ishergi_v1');
+      if (raw) Object.assign(state, JSON.parse(raw));
+    }catch{}
+  }
+
+  load(); render();
+
+  // ==== LEVEL 2 PACMAN ====
+  let pacmanGame=false;
+
+  document.getElementById('startLevel2Btn').addEventListener('click', ()=>{
+    document.getElementById('overlayLevel2').classList.add('hidden');
+    startLevel2();
+  });
+
+  function startLevel2(){
+    document.getElementById('level1wrap').classList.add('hidden');
+    document.getElementById('overlay').classList.add('hidden');
+    document.getElementById('level2').classList.remove('hidden');
+    pacmanInit();
+  }
+
+  function pacmanInit(){
+    const canvas=document.getElementById('pacmanCanvas');
+    const ctx=canvas.getContext('2d');
+    const mapSize=15;
+    let map=Array.from({length:mapSize},()=> Array(mapSize).fill(0));
+    for(let i=0;i<mapSize;i++){ map[0][i]=1; map[mapSize-1][i]=1; map[i][0]=1; map[i][mapSize-1]=1; }
+    let pac={x:1,y:1,dx:0,dy:0};
+    let ish={x:mapSize-2,y:mapSize-2};
+    let tokensLeft=(mapSize-2)*(mapSize-2);
+
+    function draw(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      const cell=canvas.width/mapSize;
+      for(let y=0;y<mapSize;y++){
+        for(let x=0;x<mapSize;x++){
+          if(map[y][x]===1){
+            ctx.fillStyle='#241f44'; ctx.fillRect(x*cell,y*cell,cell,cell);
+          }else if(map[y][x]===0){
+            ctx.fillStyle='#6b5cff'; ctx.beginPath();
+            ctx.arc(x*cell+cell/2,y*cell+cell/2,3,0,Math.PI*2); ctx.fill();
+          }
+        }
+      }
+      ctx.fillStyle='yellow'; ctx.beginPath();
+      ctx.arc(pac.x*cell+cell/2,pac.y*cell+cell/2,cell/2-2,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='red'; ctx.beginPath();
+      ctx.arc(ish.x*cell+cell/2,ish.y*cell+cell/2,cell/2-2,0,Math.PI*2); ctx.fill();
+    }
+
+    function update(){
+      const nx=pac.x+pac.dx, ny=pac.y+pac.dy;
+      if(map[ny]?.[nx]!==1){ pac.x=nx; pac.y=ny; }
+      if(map[pac.y][pac.x]===0){ map[pac.y][pac.x]=2; tokensLeft--; }
+      if(Math.abs(ish.x-pac.x)>Math.abs(ish.y-pac.y)) ish.x+=Math.sign(pac.x-ish.x);
+      else ish.y+=Math.sign(pac.y-ish.y);
+      if(ish.x===pac.x && ish.y===pac.y) endLevel2(false);
+      if(tokensLeft<=0) endLevel2(true);
+    }
+
+    function loop(){ update(); draw(); if(pacmanGame) requestAnimationFrame(loop); }
+    pacmanGame=true; loop();
+    document.addEventListener('keydown',(e)=>{
+      if(e.key==='ArrowUp')   {pac.dx=0;pac.dy=-1;}
+      if(e.key==='ArrowDown') {pac.dx=0;pac.dy=1;}
+      if(e.key==='ArrowLeft') {pac.dx=-1;pac.dy=0;}
+      if(e.key==='ArrowRight'){pac.dx=1;pac.dy=0;}
+    });
+  }
+
+  function endLevel2(win){
+    pacmanGame=false;
+    const t=document.getElementById('end2Title');
+    const p=document.getElementById('end2Text');
+    if(win){ t.textContent="Поздравляем!"; p.textContent=`Ты собрал все токены на втором уровне! Итого ${fmt(state.tokens)} токенов.`;}
+    else { t.textContent="Ищерги победили!"; p.textContent=`Тебя поймали. Счёт: ${fmt(state.tokens)} токенов.`;}
+    document.getElementById('overlayEnd2').classList.remove('hidden');
+    document.getElementById('shareBtnEnd2').onclick=share;
+    document.getElementById('resetBtnEnd2').onclick=()=>window.location.reload();
+  }
+
 })();
