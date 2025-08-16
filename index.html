@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Игры: Кликер и Ищерги‑ман</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <h1>Game Hub</h1>
+      <p class="sub">Выбирай игру: покорми ищергов или убеги от них!</p>
+    </header>
+
+    <section class="menu">
+      <button id="clickerBtn" class="cta">Кликер</button>
+      <button id="pacmanBtn" class="cta">Pac‑Man</button>
+    </section>
+
+    <section id="gameContainer">
+      
+      <div id="clickerGame" class="game hidden">
+        <section class="stats">
+          <div class="stat"><span class="label">Скормлено токенов</span><span id="tokensValue">0</span></div>
+          <div class="stat"><span class="label">Популяция ищергов</span><span id="popValue">3</span></div>
+        </section>
+        <section class="bars">
+          <div class="bar">
+            <div class="bar-top">
+              <span>VRAM</span><span id="vramPct">100%</span>
+            </div>
+            <div class="bar-track"><div id="vramBar" class="bar-fill"></div></div>
+          </div>
+          <div class="bar">
+            <div class="bar-top">
+              <span>Контекст</span><span id="ctxPct">100%</span>
+            </div>
+            <div class="bar-track"><div id="ctxBar" class="bar-fill"></div></div>
+          </div>
+        </section>
+        <section class="arena">
+          <button id="feedBtn" class="feed">
+            <span class="token">🟣</span>
+            <span class="feed-text">Скормить токен</span>
+            <span class="hint">[Пробел] — тоже работает</span>
+          </button>
+          <div id="swarm" class="swarm"></div>
+        </section>
+        <section class="actions">
+          <button id="shareBtn" class="ghost">Поделиться</button>
+          <button id="resetBtn" class="ghost">Сбросить</button>
+          <button class="cta" id="toMenu1">В меню</button>
+        </section>
+        <footer class="foot"><small>Совет: Shift+Alt — ищерги убегают.</small></footer>
+        <div id="overlay" class="overlay hidden">
+          <div class="ov-card">
+            <h2>Квота исчерпана</h2>
+            <p id="ovText">Ищерги сыты. VRAM и контекст на нуле.</p>
+            <div class="ov-actions">
+              <button id="shareBtn2" class="ghost">Поделиться</button>
+            </div>
+            <button id="closeOv" class="linklike">Попробовать ещё</button>
+          </div>
+        </div>
+      </div>
+
+      
+      <div id="pacmanGame" class="game hidden">
+        <section class="hud">
+          <div class="stat"><span>Очки</span><strong id="score">0</strong></div>
+          <div class="stat"><span>Осталось</span><strong id="left">0</strong></div>
+          <div class="stat"><span>Жизни</span><strong id="lives">❤️❤️❤️</strong></div>
+        </section>
+        <section class="stage">
+          <canvas id="game"></canvas>
+          <div class="dpad">
+            <button data-dir="up">▲</button>
+            <div class="lr">
+              <button data-dir="left">◀</button>
+              <button data-dir="right">▶</button>
+            </div>
+            <button data-dir="down">▼</button>
+          </div>
+        </section>
+        <section class="actions">
+          <button id="restart" class="ghost">Заново</button>
+          <button id="share" class="ghost">Поделиться</button>
+          <button class="cta" id="toMenu2">В меню</button>
+        </section>
+        <div id="overlayPac" class="overlay hidden">
+          <div class="ov-card">
+            <h2 id="ovTitle">Игра окончена</h2>
+            <p id="ovText"></p>
+            <div class="ov-actions">
+              <button id="ovRestart" class="cta">Сыграть ещё</button>
+              <button id="ovShare" class="ghost">Поделиться</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="app.js" defer></script>
+</body>
+</html>
