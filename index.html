@@ -2,105 +2,110 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <title>Игры: Кликер и Ищерги‑ман</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Покорми ищергов токенами</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Кликер: корми ищергов токенами, смотри как исчерпываются VRAM и контекст.">
   <link rel="stylesheet" href="styles.css">
+  <meta property="og:title" content="Покорми ищергов токенами">
+  <meta property="og:description" content="Кликни и исчерпай квоты. Сможешь удержать ищергов?">
+  <meta property="og:image" content="og.png">
+  <meta name="theme-color" content="#6b5cff">
 </head>
 <body>
-  <main class="wrap">
+  <main class="wrap" id="level1wrap">
     <header class="top">
-      <h1>Game Hub</h1>
-      <p class="sub">Выбирай игру: покорми ищергов или убеги от них!</p>
+      <h1>Покорми ищергов токенами</h1>
+      <p class="sub">Кликай, чтобы скормить токены. Ищерги растут, квоты тают.</p>
     </header>
 
-    <section class="menu">
-      <button id="clickerBtn" class="cta">Кликер</button>
-      <button id="pacmanBtn" class="cta">Pac‑Man</button>
-    </section>
-
-    <section id="gameContainer">
-      
-      <div id="clickerGame" class="game hidden">
-        <section class="stats">
-          <div class="stat"><span class="label">Скормлено токенов</span><span id="tokensValue">0</span></div>
-          <div class="stat"><span class="label">Популяция ищергов</span><span id="popValue">3</span></div>
-        </section>
-        <section class="bars">
-          <div class="bar">
-            <div class="bar-top">
-              <span>VRAM</span><span id="vramPct">100%</span>
-            </div>
-            <div class="bar-track"><div id="vramBar" class="bar-fill"></div></div>
-          </div>
-          <div class="bar">
-            <div class="bar-top">
-              <span>Контекст</span><span id="ctxPct">100%</span>
-            </div>
-            <div class="bar-track"><div id="ctxBar" class="bar-fill"></div></div>
-          </div>
-        </section>
-        <section class="arena">
-          <button id="feedBtn" class="feed">
-            <span class="token">🟣</span>
-            <span class="feed-text">Скормить токен</span>
-            <span class="hint">[Пробел] — тоже работает</span>
-          </button>
-          <div id="swarm" class="swarm"></div>
-        </section>
-        <section class="actions">
-          <button id="shareBtn" class="ghost">Поделиться</button>
-          <button id="resetBtn" class="ghost">Сбросить</button>
-          <button class="cta" id="toMenu1">В меню</button>
-        </section>
-        <footer class="foot"><small>Совет: Shift+Alt — ищерги убегают.</small></footer>
-        <div id="overlay" class="overlay hidden">
-          <div class="ov-card">
-            <h2>Квота исчерпана</h2>
-            <p id="ovText">Ищерги сыты. VRAM и контекст на нуле.</p>
-            <div class="ov-actions">
-              <button id="shareBtn2" class="ghost">Поделиться</button>
-            </div>
-            <button id="closeOv" class="linklike">Попробовать ещё</button>
-          </div>
-        </div>
+    <section class="stats">
+      <div class="stat">
+        <span class="label">Скормлено токенов</span>
+        <span class="value" id="tokensValue">0</span>
       </div>
-
-      
-      <div id="pacmanGame" class="game hidden">
-        <section class="hud">
-          <div class="stat"><span>Очки</span><strong id="score">0</strong></div>
-          <div class="stat"><span>Осталось</span><strong id="left">0</strong></div>
-          <div class="stat"><span>Жизни</span><strong id="lives">❤️❤️❤️</strong></div>
-        </section>
-        <section class="stage">
-          <canvas id="game"></canvas>
-          <div class="dpad">
-            <button data-dir="up">▲</button>
-            <div class="lr">
-              <button data-dir="left">◀</button>
-              <button data-dir="right">▶</button>
-            </div>
-            <button data-dir="down">▼</button>
-          </div>
-        </section>
-        <section class="actions">
-          <button id="restart" class="ghost">Заново</button>
-          <button id="share" class="ghost">Поделиться</button>
-          <button class="cta" id="toMenu2">В меню</button>
-        </section>
-        <div id="overlayPac" class="overlay hidden">
-          <div class="ov-card">
-            <h2 id="ovTitle">Игра окончена</h2>
-            <p id="ovText"></p>
-            <div class="ov-actions">
-              <button id="ovRestart" class="cta">Сыграть ещё</button>
-              <button id="ovShare" class="ghost">Поделиться</button>
-            </div>
-          </div>
-        </div>
+      <div class="stat">
+        <span class="label">Популяция ищергов</span>
+        <span class="value" id="popValue">3</span>
       </div>
     </section>
+
+    <section class="bars">
+      <div class="bar">
+        <div class="bar-top">
+          <span>VRAM</span>
+          <span id="vramPct">100%</span>
+        </div>
+        <div class="bar-track"><div id="vramBar" class="bar-fill"></div></div>
+      </div>
+      <div class="bar">
+        <div class="bar-top">
+          <span>Контекст</span>
+          <span id="ctxPct">100%</span>
+        </div>
+        <div class="bar-track"><div id="ctxBar" class="bar-fill bar-ctx"></div></div>
+      </div>
+    </section>
+
+    <section class="arena">
+      <button id="feedBtn" class="feed" aria-label="Скормить токен (пробел)">
+        <span class="token">🟣</span>
+        <span class="feed-text">Скормить токен</span>
+        <span class="hint">Пробел тоже работает</span>
+      </button>
+      <div id="swarm" class="swarm" aria-hidden="true"></div>
+    </section>
+
+    <section class="actions">
+      <button id="shareBtn" class="ghost">Поделиться результатом</button>
+      <button id="resetBtn" class="ghost">Сбросить</button>
+      <a id="gotoMain" class="cta" href="https://bothub.ru/?utm_source=ischerpyvat&utm_medium=ishergi_clicker&utm_campaign=typo_traffic" rel="noopener">Перейти в BotHub →</a>
+    </section>
+
+    <footer class="foot">
+      <small>Совет: Shift+Alt — ищерги пугаются и разбегаются.</small>
+    </footer>
   </main>
+
+  <div id="overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="ovTitle">
+    <div class="ov-card">
+      <h2 id="ovTitle">Квота исчерпана</h2>
+      <p id="ovText">Ищерги сыты. VRAM и контекст на нуле.</p>
+      <div class="ov-actions">
+        <button id="shareBtn2" class="ghost">Поделиться</button>
+        <a class="cta" href="https://bothub.ru/?utm_source=ischerpyvat&utm_medium=ishergi_clicker&utm_campaign=quota_overlay" rel="noopener">В BotHub</a>
+      </div>
+      <button id="closeOv" class="linklike">Попробовать ещё</button>
+    </div>
+  </div>
+
+  
+  <div id="overlayLevel2" class="overlay hidden" role="dialog" aria-modal="true">
+    <div class="ov-card">
+      <h2>Поздравляем!</h2>
+      <p>Вы прошли первый уровень и переходите на второй. Готовы к Паттону?</p>
+      <div class="ov-actions">
+        <button id="startLevel2Btn" class="cta">Начать уровень 2</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <section id="level2" class="hidden">
+    <canvas id="pacmanCanvas" width="480" height="480"></canvas>
+  </section>
+
+  
+  <div id="overlayEnd2" class="overlay hidden" role="dialog" aria-modal="true">
+    <div class="ov-card">
+      <h2 id="end2Title">Итоги второго уровня</h2>
+      <p id="end2Text"></p>
+      <div class="ov-actions">
+        <button id="shareBtnEnd2" class="ghost">Поделиться</button>
+        <button id="resetBtnEnd2" class="ghost">Сбросить</button>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js" defer></script>
 </body>
 </html>
