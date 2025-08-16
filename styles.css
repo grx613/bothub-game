@@ -1,0 +1,31 @@
+/* базовые */
+body{margin:0;font-family:system-ui,Arial,sans-serif;background:#0f0e17;color:#fff;text-align:center}
+.wrap{max-width:960px;margin:auto;padding:16px}
+.top h1{margin:8px 0 4px}
+.sub{margin:0 0 12px;color:#aaa}
+.menu{margin:20px;display:flex;justify-content:center;gap:14px}
+button, .cta{padding:10px 16px;border:none;border-radius:10px;cursor:pointer;font-weight:700}
+.cta{background:#6b5cff;color:#fff}
+.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3)}
+.hidden{display:none}
+.stat{background:#1a1830;margin:6px;padding:8px 10px;border-radius:8px;display:flex;justify-content:space-between}
+
+/* CLICKER */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bars{margin:10px 0}
+.bar-top{display:flex;justify-content:space-between;font-size:14px}
+.bar-track{background:#2b2950;height:14px;border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,#31d0aa,#ffba49)}
+.feed{margin:16px auto;padding:18px;border-radius:12px;background:#241f44;color:#fff}
+.swarm{position:relative;min-height:180px}
+.ish{position:absolute;width:22px;height:22px}
+.actions{margin:12px 0;display:flex;gap:10px;justify-content:center}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center}
+.ov-card{background:#1a1830;padding:20px;border-radius:12px}
+
+/* PACMAN */
+.stage{margin:16px;display:flex;justify-content:center}
+#game{background:#0b0a16;border:1px solid #333;width:min(94vw,560px);aspect-ratio:1/1}
+.dpad{position:absolute;right:20px;bottom:20px;display:grid;gap:4px}
+.dpad .lr{display:flex;gap:4px;justify-content:center}
+.dpad button{background:#201b3a;color:#fff;padding:6px 12px;border-radius:8px}
